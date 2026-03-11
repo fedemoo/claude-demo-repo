@@ -1,0 +1,33 @@
+name: Claude Issue Assistant
+
+# Triggered when someone comments "@claude" on an issue or PR.
+# Claude will read the issue/PR context and respond or take action.
+#
+# MANUAL SETUP REQUIRED:
+#   Add ANTHROPIC_API_KEY as a repository secret before this workflow will work.
+#   See NOTES.md for instructions.
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude:
+    # Only run when the comment contains "@claude"
+    if: contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Action
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
